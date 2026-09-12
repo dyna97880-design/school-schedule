@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Расписание занятий — Школа №107</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f1e;--card-bg:rgba(255,255,255,0.06);--card-border:rgba(255,255,255,0.1);--primary:#6366f1;--primary-light:#818cf8;--accent:#ec4899;--accent2:#14b8a6;--text:#e2e8f0;--text-muted:#94a3b8;--radius:16px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;position:relative}
+.bubble{position:fixed;border-radius:50%;filter:blur(60px);opacity:0.15;z-index:0;animation:float 20s infinite ease-in-out}
+.bubble:nth-child(1){width:400px;height:400px;background:var(--primary);top:-100px;left:-100px}
+.bubble:nth-child(2){width:350px;height:350px;background:var(--accent);bottom:-80px;right:-80px;animation-delay:-5s}
+.bubble:nth-child(3){width:300px;height:300px;background:var(--accent2);top:40%;right:10%;animation-delay:-10s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-40px) scale(1.1)}50%{transform:translate(-20px,30px) scale(0.95)}75%{transform:translate(40px,20px) scale(1.05)}}
+header{position:relative;z-index:1;text-align:center;padding:2.5rem 1rem 1.5rem;animation:slideDown 0.6s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--primary-light),var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text-muted);margin-top:0.4rem;font-size:0.9rem}
+.school-badge{display:inline-flex;align-items:center;gap:0.5rem;background:var(--card-bg);border:1px solid var(--card-border);padding:0.5rem 1.2rem;border-radius:50px;margin-bottom:1rem;font-size:0.85rem;font-weight:500;backdrop-filter:blur(10px)}
+.pulse-dot{width:10px;height:10px;background:var(--accent2);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(20,184,166,0.4)}50%{box-shadow:0 0 0 8px rgba(20,184,166,0)}}
+.tabs{display:flex;justify-content:center;gap:0.5rem;position:relative;z-index:1;flex-wrap:wrap;padding:0 1rem;margin-bottom:1.5rem}
+.tab{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text-muted);padding:0.6rem 1.4rem;border-radius:12px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.3s ease;backdrop-filter:blur(10px);user-select:none}
+.tab:hover{color:var(--text);border-color:var(--primary-light);transform:translateY(-2px)}
+.tab.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:white;border-color:transparent;box-shadow:0 4px 16px rgba(99,102,241,0.3)}
+.search-box{display:flex;justify-content:center;margin-bottom:1.5rem;position:relative;z-index:1;padding:0 1rem}
+.search-input{width:100%;max-width:400px;background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:0.65rem 1rem;border-radius:12px;font-size:0.9rem;backdrop-filter:blur(10px);transition:all 0.3s ease;outline:none}
+.search-input:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(99,102,241,0.15)}
+.search-input::placeholder{color:var(--text-muted)}
+.grade-selector{display:flex;justify-content:center;gap:0.3rem;flex-wrap:wrap;padding:0 1rem;margin-bottom:0.8rem;position:relative;z-index:1}
+.grade-btn{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text-muted);padding:0.4rem 0.8rem;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;transition:all 0.25s ease;backdrop-filter:blur(10px)}
+.grade-btn:hover{color:var(--text);border-color:var(--primary-light)}
+.grade-btn.active{background:var(--primary);color:white;border-color:transparent}
+.class-selector{display:flex;justify-content:center;gap:0.4rem;flex-wrap:wrap;padding:0 1rem;margin-bottom:1.5rem;position:relative;z-index:1}
+.class-btn{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text-muted);padding:0.45rem 0.9rem;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.25s ease;backdrop-filter:blur(10px)}
+.class-btn:hover{color:var(--text);border-color:var(--primary-light);transform:scale(1.08)}
+.class-btn.active{background:var(--primary);color:white;border-color:transparent;box-shadow:0 2px 12px rgba(99,102,241,0.4)}
+.actions{display:flex;justify-content:center;gap:0.6rem;margin-bottom:1.5rem;position:relative;z-index:1;flex-wrap:wrap;padding:0 1rem}
+.action-btn{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:0.5rem 1rem;border-radius:10px;cursor:pointer;font-size:0.82rem;transition:all 0.25s ease;backdrop-filter:blur(10px);display:inline-flex;align-items:center;gap:0.4rem}
+.action-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.action-btn.fav-active{background:rgba(236,72,153,0.2);border-color:var(--accent);color:var(--accent)}
+.days-nav{display:flex;justify-content:center;gap:0.4rem;flex-wrap:wrap;padding:0 1rem;margin-bottom:1.5rem;position:relative;z-index:1}
+.day-btn{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text-muted);padding:0.55rem 1.1rem;border-radius:12px;cursor:pointer;font-size:0.88rem;font-weight:500;transition:all 0.3s ease;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.day-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--primary),var(--accent));opacity:0;transition:opacity 0.3s ease;z-index:-1}
+.day-btn:hover{color:var(--text);border-color:var(--primary-light);transform:translateY(-2px)}
+.day-btn.active{color:white;border-color:transparent;box-shadow:0 4px 14px rgba(99,102,241,0.35)}
+.day-btn.active::before{opacity:1}
+.schedule-container{max-width:720px;margin:0 auto;padding:0 1rem 3rem;position:relative;z-index:1}
+.day-title{text-align:center;font-size:1.3rem;font-weight:700;margin-bottom:1.2rem;color:var(--text)}
+.day-title span{color:var(--primary-light)}
+.lesson{display:flex;align-items:stretch;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:0.8rem;overflow:hidden;backdrop-filter:blur(12px);transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease;animation:slideIn 0.5s ease-out both}
+@keyframes slideIn{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+.lesson:hover{transform:translateX(6px);box-shadow:0 6px 24px rgba(0,0,0,0.3);border-color:var(--primary-light)}
+.lesson-color{width:6px;flex-shrink:0}
+.lesson-num{display:flex;align-items:center;justify-content:center;width:50px;flex-shrink:0;font-size:1.3rem;font-weight:800;color:var(--text-muted);background:rgba(255,255,255,0.03)}
+.lesson-body{flex:1;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.25rem}
+.lesson-time{font-size:0.78rem;color:var(--text-muted);font-weight:500}
+.lesson-subject{font-size:1.05rem;font-weight:600;color:var(--text)}
+.lesson-info{display:flex;gap:1rem;font-size:0.82rem;color:var(--text-muted);margin-top:0.2rem;flex-wrap:wrap}
+.lesson-info span{display:inline-flex;align-items:center;gap:0.3rem}
+.lesson-room{background:rgba(99,102,241,0.15);color:var(--primary-light);padding:0.1rem 0.6rem;border-radius:6px;font-weight:600;font-size:0.78rem}
+.no-lessons{text-align:center;padding:3rem 1rem;color:var(--text-muted);animation:fadeIn 0.5s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.no-lessons .emoji{font-size:3rem;display:block;margin-bottom:1rem;animation:bounce 1.5s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.calendar-wrapper{max-width:500px;margin:0 auto 1.5rem;position:relative;z-index:1;padding:0 1rem;display:none}
+.calendar-wrapper.show{display:block;animation:fadeIn 0.3s ease}
+.calendar{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.2rem;backdrop-filter:blur(12px)}
+.cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.cal-month{font-size:1.1rem;font-weight:700;color:var(--text)}
+.cal-nav{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.cal-nav:hover{border-color:var(--primary-light);color:var(--primary-light)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{text-align:center;font-size:0.7rem;color:var(--text-muted);font-weight:600;padding:0.3rem 0}
+.cal-day{text-align:center;padding:0.45rem 0;border-radius:8px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;color:var(--text);position:relative}
+.cal-day:hover{background:rgba(99,102,241,0.15)}
+.cal-day.other{opacity:0.3}
+.cal-day.today{background:rgba(20,184,166,0.2);color:var(--accent2);font-weight:700}
+.cal-day.selected{background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-weight:700}
+.cal-day.weekend{color:var(--accent)}
+.teachers-container{max-width:900px;margin:0 auto;padding:0 1rem 3rem;position:relative;z-index:1}
+.teachers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+.teacher-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.2rem;backdrop-filter:blur(12px);transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease;animation:fadeInUp 0.5s ease-out both;position:relative;overflow:hidden;cursor:pointer}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.teacher-card:hover{transform:translateY(-6px);box-shadow:0 8px 28px rgba(0,0,0,0.35);border-color:var(--primary-light)}
+.teacher-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent),var(--accent2));opacity:0;transition:opacity 0.3s ease}
+.teacher-card:hover::after{opacity:1}
+.teacher-avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:white;margin-bottom:0.8rem;flex-shrink:0}
+.teacher-name{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;line-height:1.3}
+.teacher-subject{font-size:0.85rem;color:var(--primary-light);font-weight:500;margin-bottom:0.5rem}
+.teacher-meta{display:flex;flex-wrap:wrap;gap:0.4rem}
+.teacher-tag{font-size:0.72rem;padding:0.15rem 0.6rem;border-radius:6px;font-weight:500}
+.tag-category{background:rgba(99,102,241,0.15);color:var(--primary-light)}
+.tag-exp{background:rgba(20,184,166,0.15);color:var(--accent2)}
+.teachers-count{text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;animation:fadeIn 0.2s ease}
+.modal-overlay.show{display:flex}
+.modal{background:#1a1a2e;border:1px solid var(--card-border);border-radius:20px;max-width:480px;width:100%;padding:0;overflow:hidden;animation:modalIn 0.3s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+.modal-header{padding:2rem 2rem 1rem;text-align:center;position:relative}
+.modal-close{position:absolute;top:1rem;right:1rem;background:var(--card-bg);border:1px solid var(--card-border);color:var(--text-muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.modal-close:hover{color:var(--accent);border-color:var(--accent)}
+.modal-avatar{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:white;margin:0 auto 1rem}
+.modal-name{font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:0.3rem}
+.modal-subject{font-size:1rem;color:var(--primary-light);font-weight:500}
+.modal-body{padding:1rem 2rem 2rem}
+.modal-info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.modal-info-row:last-child{border-bottom:none}
+.modal-info-label{color:var(--text-muted);font-size:0.85rem;font-weight:500}
+.modal-info-value{color:var(--text);font-size:0.9rem;font-weight:600;text-align:right;max-width:60%}
+.fav-container{max-width:720px;margin:0 auto;padding:0 1rem 3rem;position:relative;z-index:1}
+.fav-empty{text-align:center;padding:4rem 1rem;color:var(--text-muted)}
+.fav-empty .emoji{font-size:3rem;display:block;margin-bottom:1rem;animation:bounce 1.5s infinite}
+.fav-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.2rem;margin-bottom:0.8rem;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;transition:all 0.3s ease;animation:slideIn 0.4s ease-out both}
+.fav-card:hover{border-color:var(--primary-light);transform:translateX(4px)}
+.fav-card-info{display:flex;align-items:center;gap:1rem}
+.fav-card-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:white}
+.fav-card-name{font-size:1rem;font-weight:600;color:var(--text)}
+.fav-card-sub{font-size:0.8rem;color:var(--text-muted)}
+.fav-card-remove{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;transition:all 0.2s}
+.fav-card-remove:hover{background:rgba(239,68,68,0.25)}
+footer{text-align:center;padding:2rem 1rem;color:var(--text-muted);font-size:0.82rem;position:relative;z-index:1;border-top:1px solid var(--card-border)}
+footer a{color:var(--primary-light);text-decoration:none;transition:color 0.2s}
+footer a:hover{color:var(--accent)}
+@media(max-width:600px){header h1{font-size:1.4rem}.lesson-num{width:38px;font-size:1.1rem}.lesson-subject{font-size:0.95rem}.tab{padding:0.5rem 1rem;font-size:0.82rem}.day-btn{padding:0.45rem 0.8rem;font-size:0.8rem}.teachers-grid{grid-template-columns:1fr}.grade-btn{padding:0.35rem 0.6rem;font-size:0.75rem}.modal{margin:0.5rem}}
+</style>
+</head>
+<body>
+<div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+<header>
+<div class="school-badge"><span class="pulse-dot"></span>МБОУ «Школа №107 им. Героя Советского Союза Вартаняна Г.А.»</div>
+<h1>Расписание занятий</h1>
+<p>г. Ростов-на-Дону, Ворошиловский район · 2026–2027 учебный год</p>
+</header>
+<div class="tabs">
+<div class="tab active" onclick="switchSection('schedule')">📅 Расписание</div>
+<div class="tab" onclick="switchSection('favorites')">⭐ Избранное</div>
+<div class="tab" onclick="switchSection('teachers')">👨‍🏫 Педагогический состав</div>
+</div>
+<div id="scheduleSection">
+<div class="actions" style="margin-bottom:1rem">
+<div class="action-btn" onclick="toggleCalendar()">📅 Календарь</div>
+<div class="action-btn" id="favBtn" onclick="toggleFavorite()">⭐ В избранное</div>
+<div class="action-btn" onclick="alert('Это мой класс!')">✅ Это мой класс</div>
+</div>
+<div class="calendar-wrapper" id="calendarWrapper"><div class="calendar" id="calendar"></div></div>
+<div class="grade-selector" id="gradeSelector">
+<div class="grade-btn" onclick="selectGrade(this,1)">1</div><div class="grade-btn" onclick="selectGrade(this,2)">2</div><div class="grade-btn" onclick="selectGrade(this,3)">3</div><div class="grade-btn" onclick="selectGrade(this,4)">4</div><div class="grade-btn active" onclick="selectGrade(this,5)">5</div><div class="grade-btn" onclick="selectGrade(this,6)">6</div><div class="grade-btn" onclick="selectGrade(this,7)">7</div><div class="grade-btn" onclick="selectGrade(this,8)">8</div><div class="grade-btn" onclick="selectGrade(this,9)">9</div><div class="grade-btn" onclick="selectGrade(this,10)">10</div><div class="grade-btn" onclick="selectGrade(this,11)">11</div>
+</div>
+<div class="class-selector" id="classSelector"></div>
+<div class="days-nav" id="daysNav">
+<div class="day-btn active" onclick="selectDay(this,0)">Пн</div><div class="day-btn" onclick="selectDay(this,1)">Вт</div><div class="day-btn" onclick="selectDay(this,2)">Ср</div><div class="day-btn" onclick="selectDay(this,3)">Чт</div><div class="day-btn" onclick="selectDay(this,4)">Пт</div><div class="day-btn" onclick="selectDay(this,5)">Сб</div>
+</div>
+<div class="schedule-container">
+<div class="day-title" id="dayTitle">Понедельник, <span>5а класс</span></div>
+<div id="lessonsList"></div>
+</div>
+</div>
+<div id="favoritesSection" style="display:none">
+<div class="fav-container"><div id="favList"></div></div>
+</div>
+<div id="teachersSection" style="display:none">
+<div class="search-box">
+<input type="text" class="search-input" id="teacherSearch" placeholder="🔍 Поиск по имени или предмету..." oninput="filterTeachers()">
+</div>
+<div class="teachers-count" id="teachersCount"></div>
+<div class="teachers-container"><div class="teachers-grid" id="teachersGrid"></div></div>
+</div>
+<div class="modal-overlay" id="teacherModal" onclick="closeModal(event)">
+<div class="modal" onclick="event.stopPropagation()">
+<div class="modal-header">
+<button class="modal-close" onclick="closeModal()">✕</button>
+<div class="modal-avatar" id="modalAvatar"></div>
+<div class="modal-name" id="modalName"></div>
+<div class="modal-subject" id="modalSubject"></div>
+</div>
+<div class="modal-body" id="modalBody"></div>
+</div>
+</div>
+<footer>© НИКА-Софт 2026 · <a href="https://school107.roovr.ru">school107.roovr.ru</a></footer>
+<script>
+var daysNames=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+var allClasses=["1а","1б","1в","1г","1д","2а","2б","2в","2г","2д","3а","3б","3в","3г","4а","4б","4в","4г","5а","5б","5в","5г","6а","6б","6в","7а","7б","7в","8а","8б","8в","9а","9б","9в","10а","10б","11а","11б"];
+var gradeClasses={};
+allClasses.forEach(function(c){var g=parseInt(c);if(!gradeClasses[g])gradeClasses[g]=[];gradeClasses[g].push(c)});
+var schedule={
+'1а':[[{num:1,time:'08:30–09:10',subject:'Литература',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:2,time:'09:20–10:00',subject:'ФЗК',teacher:'Бондаренко-Добряк С.А.',room:'спортзал',color:'#ef4444'},{num:3,time:'10:20–11:00',subject:'Динамическая пауза',teacher:'—',room:'—',color:'#94a3b8'},{num:4,time:'11:20–12:00',subject:'Русский язык',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:5,time:'12:15–12:55',subject:'Математика',teacher:'Богославская Т.Ю.',room:'101',color:'#6366f1'}],[{num:1,time:'08:30–09:10',subject:'Литература',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:2,time:'09:20–10:00',subject:'Русский язык',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:3,time:'10:20–11:00',subject:'Динамическая пауза',teacher:'—',room:'—',color:'#94a3b8'},{num:4,time:'11:20–12:00',subject:'Математика',teacher:'Богославская Т.Ю.',room:'101',color:'#6366f1'},{num:5,time:'12:15–12:55',subject:'Окружающий мир',teacher:'Богославская Т.Ю.',room:'101',color:'#22c55e'}],[{num:1,time:'08:30–09:10',subject:'Литература',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:2,time:'09:20–10:00',subject:'Русский язык',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:3,time:'10:20–11:00',subject:'Динамическая пауза',teacher:'—',room:'—',color:'#94a3b8'},{num:4,time:'11:20–12:00',subject:'Музыка',teacher:'Седых Н.П.',room:'108',color:'#a855f7'},{num:5,time:'12:15–12:55',subject:'Технология',teacher:'Игнатова Е.В.',room:'110',color:'#f97316'}],[{num:1,time:'08:30–09:10',subject:'Литература',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:2,time:'09:20–10:00',subject:'Русский язык',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:3,time:'10:20–11:00',subject:'Динамическая пауза',teacher:'—',room:'—',color:'#94a3b8'},{num:4,time:'11:20–12:00',subject:'ФЗК',teacher:'Бондаренко-Добряк С.А.',room:'спортзал',color:'#ef4444'},{num:5,time:'12:15–12:55',subject:'Математика',teacher:'Богославская Т.Ю.',room:'101',color:'#6366f1'}],[{num:1,time:'08:30–09:10',subject:'Русский язык',teacher:'Богославская Т.Ю.',room:'101',color:'#ec4899'},{num:2,time:'09:20–10:00',subject:'Математика',teacher:'Богославская Т.Ю.',room:'101',color:'#6366f1'},{num:3,time:'10:20–11:00',subject:'Динамическая пауза',teacher:'—',room:'—',color:'#94a3b8'},{num:4,time:'11:20–12:00',subject:'ИЗО',teacher:'Черная О.А.',room:'110',color:'#f43f5e'},{num:5,time:'12:15–12:55',subject:'Окружающий мир',teacher:'Богославская Т.Ю.',room:'101',color:'#22c55e'}],[]],
+'5а':[[{num:1,time:'08:30–09:15',subject:'Математика',teacher:'Герасимова О.С.',room:'215',color:'#6366f1'},{num:2,time:'09:25–10:10',subject:'Русский язык',teacher:'Александрова Н.С.',room:'103',color:'#ec4899'},{num:3,time:'10:20–11:05',subject:'История',teacher:'Бабенко П.В.',room:'302',color:'#f59e0b'},{num:4,time:'11:15–12:00',subject:'Английский язык',teacher:'Авдышоева Е.Ф.',room:'118',color:'#14b8a6'},{num:5,time:'12:10–12:55',subject:'Биология',teacher:'Доля Н.В.',room:'401',color:'#22c55e'},{num:6,time:'13:05–13:50',subject:'Физкультура',teacher:'Бондаренко-Добряк С.А.',room:'спортзал',color:'#ef4444'}],[{num:1,time:'08:30–09:15',subject:'Литература',teacher:'Александрова Н.С.',room:'103',color:'#ec4899'},{num:2,time:'09:25–10:10',subject:'Математика',teacher:'Герасимова О.С.',room:'215',color:'#6366f1'},{num:3,time:'10:20–11:05',subject:'Химия',teacher:'Ануфриева Е.Н.',room:'308',color:'#8b5cf6'},{num:4,time:'11:15–12:00',subject:'Английский язык',teacher:'Васильева А.Д.',room:'118',color:'#14b8a6'},{num:5,time:'12:10–12:55',subject:'ОБЗР',teacher:'Барашков А.Н.',room:'205',color:'#f97316'}],[{num:1,time:'08:30–09:15',subject:'Математика',teacher:'Герасимова О.С.',room:'215',color:'#6366f1'},{num:2,time:'09:25–10:10',subject:'Русский язык',teacher:'Александрова Н.С.',room:'103',color:'#ec4899'},{num:3,time:'10:20–11:05',subject:'История',teacher:'Бабенко П.В.',room:'302',color:'#f59e0b'},{num:4,time:'11:15–12:00',subject:'Иностранный язык',teacher:'Авдышоева Е.Ф.',room:'118',color:'#14b8a6'},{num:5,time:'12:10–12:55',subject:'Информатика',teacher:'Сметанина И.Н.',room:'405',color:'#3b82f6'}],[{num:1,time:'08:30–09:15',subject:'Английский язык',teacher:'Васильева А.Д.',room:'118',color:'#14b8a6'},{num:2,time:'09:25–10:10',subject:'Математика',teacher:'Герасимова О.С.',room:'215',color:'#6366f1'},{num:3,time:'10:20–11:05',subject:'Химия',teacher:'Ануфриева Е.Н.',room:'308',color:'#8b5cf6'},{num:4,time:'11:15–12:00',subject:'Русский язык',teacher:'Александрова Н.С.',room:'103',color:'#ec4899'},{num:5,time:'12:10–12:55',subject:'Физкультура',teacher:'Бондаренко-Добряк С.А.',room:'спортзал',color:'#ef4444'}],[{num:1,time:'08:30–09:15',subject:'Литература',teacher:'Александрова Н.С.',room:'103',color:'#ec4899'},{num:2,time:'09:25–10:10',subject:'Математика',teacher:'Герасимова О.С.',room:'215',color:'#6366f1'},{num:3,time:'10:20–11:05',subject:'Биология',teacher:'Доля Н.В.',room:'401',color:'#22c55e'},{num:4,time:'11:15–12:00',subject:'История',teacher:'Бабенко П.В.',room:'302',color:'#f59e0b'},{num:5,time:'12:10–12:55',subject:'Классный час',teacher:'Александрова Н.С.',room:'103',color:'#f59e0b'}],[]]
+};
+'1б 1в 1г 1д 2а 2б 2в 2г 2д 3а 3б 3в 3г 4а 4б 4в 4г 5б 5в 5г 6а 6б 6в 7а 7б 7в 8а 8б 8в 9а 9б 9в 10а 10б 11а 11б'.split(' ').forEach(function(c){schedule[c]=[[],[],[],[],[],[]]});
+var teachers=[
+{name:"Авдышоева Елена Фрунзеевна",subject:"Иностранный язык",category:"Высшая",exp:"21 год",education:"Высшее, иностранные языки",color:"#14b8a6"},
+{name:"Александрова Нина Семёновна",subject:"Русский язык и литература",category:"Высшая",exp:"41 год",education:"Высшее, русский язык и литература",color:"#ec4899"},
+{name:"Ануфриева Елена Николаевна",subject:"Химия",category:"Высшее",exp:"48 лет",education:"Высшее, химик",color:"#8b5cf6"},
+{name:"Бабенко Полина Викторовна",subject:"История",category:"Первая",exp:"34 года",education:"Высшее, историк",color:"#f59e0b"},
+{name:"Барашков Артемий Николаевич",subject:"ОБЗР",category:"Магистр",exp:"1 год",education:"Высшее, педагогическое образование",color:"#f97316"},
+{name:"Бернякович Эльмира Нурмидхатовна",subject:"Тьютор",category:"Высшее",exp:"8 лет",education:"Высшее, социальная структура и процессы",color:"#06b6d4"},
+{name:"Богославская Татьяна Юрьевна",subject:"Учитель начальных классов",category:"Высшая",exp:"36 лет",education:"Высшее, преподаватель истории",color:"#22c55e"},
+{name:"Бондаренко-Добряк Светлана Альбертовна",subject:"Физическая культура",category:"Магистр",exp:"34 года",education:"Высшее, педагогическое образование",color:"#ef4444"},
+{name:"Бруевич Анна Евгеньевна",subject:"Учитель-логопед",category:"Первая",exp:"24 года",education:"Высшее, логопедия",color:"#a855f7"},
+{name:"Васильева Ангелина Дмитриевна",subject:"Иностранный язык",category:"Высшая",exp:"6 лет",education:"Высшее, педагогическое образование",color:"#14b8a6"},
+{name:"Владимирова Вера Михайловна",subject:"Учитель начальных классов",category:"Высшая",exp:"32 года",education:"Высшее, преподавание в начальных классах",color:"#22c55e"},
+{name:"Волк Ирина Александровка",subject:"Иностранный язык",category:"—",exp:"1 год",education:"—",color:"#14b8a6"},
+{name:"Гамалей Анастасия Константиновна",subject:"Иностранный язык",category:"Первая",exp:"1 год",education:"Среднее специальное, преподавание в начальных классах",color:"#3b82f6"},
+{name:"Герасимова Ольга Сергеевна",subject:"Математика",category:"Высшая",exp:"53 года",education:"Высшее, учитель математики",color:"#6366f1"},
+{name:"Горбунова Наталия Анатольевна",subject:"Учитель начальных классов",category:"Высшая",exp:"28 лет",education:"Высшее, учитель нач. кл.",color:"#22c55e"},
+{name:"Дедусёва Кристина Александровна",subject:"Учитель начальных классов",category:"—",exp:"—",education:"Высшее, педагогическое образование",color:"#22c55e"},
+{name:"Демиденко Анна Ивановна",subject:"Учитель начальных классов",category:"Высшая",exp:"11 лет",education:"Высшее, учитель истории",color:"#22c55e"},
+{name:"Доля Наталья Владимировна",subject:"Биология",category:"Высшая",exp:"32 года",education:"Высшее, биолог",color:"#22c55e"},
+{name:"Дудина Елена Александровна",subject:"Учитель начальных классов",category:"Высшая",exp:"35 лет",education:"Высшее, педагогика",color:"#22c55e"},
+{name:"Дьякова Оксана Викторовна",subject:"Учитель начальных классов",category:"Высшая",exp:"29 лет",education:"Высшее, учитель русского языка",color:"#22c55e"},
+{name:"Ежкова Елизавета Станиславовна",subject:"Тьютор",category:"Магистр",exp:"20 лет",education:"Высшее, педагогическое образование",color:"#06b6d4"},
+{name:"Ермоленко Анастасия Сергеевна",subject:"Учитель начальных классов",category:"Высшее",exp:"5 лет",education:"Высшее, дефектология",color:"#22c55e"},
+{name:"Жижимова Людмила Александровна",subject:"Иностранный язык",category:"Первая",exp:"15 лет",education:"Высшее, педагогическое образование",color:"#14b8a6"},
+{name:"Жилина Татьяна Анатольевна",subject:"Математика",category:"Высшая",exp:"40 лет",education:"Высшее, прикладная математика",color:"#6366f1"},
+{name:"Зайченко Наталья Витальевна",subject:"Учитель начальных классов",category:"Высшее",exp:"31 год",education:"Высшее, филология",color:"#22c55e"},
+{name:"Ивашова Ирина Васильевна",subject:"Математика",category:"Высшая",exp:"29 лет",education:"Высшее, математика",color:"#6366f1"},
+{name:"Игнатова Елена Васильевна",subject:"Технология",category:"Высшая",exp:"37 лет",education:"Высшее, педагогическое образование",color:"#f97316"},
+{name:"Калюжная Елена Александровна",subject:"География",category:"Высшая",exp:"24 года",education:"Высшее, экономическая география",color:"#06b6d4"},
+{name:"Козикова Ангелина Николаевна",subject:"Учитель-логопед",category:"Высшее",exp:"25 лет",education:"Высшее, логопедия",color:"#a855f7"},
+{name:"Колыхалина Светлана Юрьевна",subject:"Математика",category:"Высшая",exp:"16 лет",education:"Высшее, физико-математическое образование",color:"#6366f1"},
+{name:"Конобеева Татьяна Анатольевна",subject:"Учитель начальных классов",category:"Высшая",exp:"32 года",education:"Высшее, педагогическое образование",color:"#22c55e"},
+{name:"Корниенко Галина Леонидовна",subject:"Технология",category:"Первая",exp:"37 лет",education:"Высшее, инженер-механик",color:"#f97316"},
+{name:"Корсунская Елена Михайловна",subject:"Учитель начальных классов",category:"Высшая",exp:"34 года",education:"Высшее, психология",color:"#22c55e"},
+{name:"Костенко Роман Анатольевич",subject:"Учитель",category:"Высшее",exp:"9 лет",education:"Высшее, математик, программист",color:"#6366f1"},
+{name:"Лисенкова Марина Андреевна",subject:"Учитель начальных классов",category:"Высшее",exp:"10 лет",education:"Высшее, педагогическое образование",color:"#22c55e"},
+{name:"Литвинова Наталья Анатольевна",subject:"Учитель-логопед",category:"Магистр",exp:"25 лет",education:"Высшее, психолого-педагогическое образование",color:"#a855f7"},
+{name:"Луганская Марина Игоревна",subject:"География",category:"Высшая",exp:"43 года",education:"Высшее, география",color:"#06b6d4"},
+{name:"Манцыгина Элеонора Геннадьевна",subject:"Русский язык и литература",category:"Высшая",exp:"40 лет",education:"Высшее, учитель русского языка",color:"#ec4899"},
+{name:"Маркина Людмила Васильевна",subject:"Иностранный язык",category:"Высшая",exp:"27 лет",education:"Высшее, языковое образование",color:"#14b8a6"},
+{name:"Матрон Кристина Эдуардовна",subject:"Математика",category:"Первая",exp:"6 лет",education:"Высшее, математическое образование",color:"#6366f1"},
+{name:"Мацюк Наталья Владиславовна",subject:"Физическая культура",category:"Высшая",exp:"33 года",education:"Высшее, педагог по физической культуре",color:"#ef4444"},
+{name:"Машукова Ольга Алексеевна",subject:"Иностранный язык",category:"Высшее",exp:"17 лет",education:"Высшее, лингвист, преподаватель",color:"#14b8a6"},
+{name:"Медведева Диана Олеговна",subject:"Учитель начальных классов",category:"Высшая",exp:"14 лет",education:"Высшее, учитель начальных классов",color:"#22c55e"},
+{name:"Михеева Татьяна Алексеевна",subject:"Иностранный язык",category:"Высшая",exp:"44 года",education:"Высшее, немецкий и английский язык",color:"#14b8a6"},
+{name:"Мукасеева Ирина Алексеевна",subject:"Учитель начальных классов",category:"Высшая",exp:"31 год",education:"Среднее профессиональное, учитель нач. кл.",color:"#22c55e"},
+{name:"Мурзаева Анастасия Робертовна",subject:"Иностранный язык",category:"Высшее",exp:"1 год",education:"Высшее, учитель русского языка",color:"#14b8a6"},
+{name:"Овчарова Татьяна Владимировна",subject:"Физика",category:"Высшее",exp:"21 год",education:"Высшее, преподаватель физики",color:"#8b5cf6"},
+{name:"Овчинникова Светлана Юрьевна",subject:"Математика",category:"Высшая",exp:"16 лет",education:"Высшее, физико-математическое образование",color:"#6366f1"},
+{name:"Павлова Ирина Александровна",subject:"Русский язык и литература",category:"Высшая",exp:"20 лет",education:"Высшее, филологическое образование",color:"#ec4899"},
+{name:"Панова Анна Сергеевна",subject:"Биология",category:"Высшая",exp:"21 год",education:"Высшее, биолог",color:"#22c55e"},
+{name:"Панфилова Анна Алексеевна",subject:"Учитель-дефектолог",category:"Первая",exp:"6 лет",education:"Высшее, дефектологическое образование",color:"#a855f7"},
+{name:"Поддубная Ирина Викторовна",subject:"Русский язык и литература",category:"Высшая",exp:"42 года",education:"Высшее, филолог, преподаватель",color:"#ec4899"},
+{name:"Потемкина Виктория Николаевна",subject:"Учитель-дефектолог",category:"Магистр",exp:"23 года",education:"Высшее, олигофренопедагогика",color:"#a855f7"},
+{name:"Пушкарная Светлана Александровна",subject:"Педагог-психолог",category:"Высшая",exp:"18 лет",education:"Высшее, педагог-психолог",color:"#a855f7"},
+{name:"Пшеничников Владимир Валентинович",subject:"Физическая культура",category:"Высшая",exp:"51 год",education:"Высшее, педагог по физической культуре",color:"#ef4444"},
+{name:"Реутенко Иван Васильевич",subject:"Физическая культура",category:"Высшая",exp:"6 лет",education:"Высшее, педагог по физической культуре",color:"#ef4444"},
+{name:"Рожкован Марина Станиславовна",subject:"Русский язык и литература",category:"Высшая",exp:"23 года",education:"Высшее, педагогическое образование",color:"#ec4899"},
+{name:"Романенко Татьяна Викторовна",subject:"Обществознание",category:"Высшая",exp:"28 лет",education:"Высшее, методика начального образования",color:"#f59e0b"},
+{name:"Румянцева Ирина Юрьевна",subject:"Учитель-логопед",category:"Среднее спец.",exp:"22 года",education:"Среднее специальное, преподавание в нач. кл.",color:"#a855f7"},
+{name:"Сабурова Наталья Семеновна",subject:"Физика",category:"Высшая",exp:"54 года",education:"Высшее, учитель физики",color:"#8b5cf6"},
+{name:"Салаватова Патимат Ирасхановна",subject:"Математика",category:"Первая",exp:"16 лет",education:"Среднее профессиональное, учитель нач. кл.",color:"#6366f1"},
+{name:"Самойленко Оксана Валентиновна",subject:"Учитель начальных классов",category:"Высшая",exp:"32 года",education:"Высшее, учитель начальных классов",color:"#22c55e"},
+{name:"Сарайникова Любовь Ивановна",subject:"Технология",category:"Высшая",exp:"54 года",education:"Высшее, общетехнические дисциплины",color:"#f97316"},
+{name:"Северина Ольга Анатольевна",subject:"Учитель начальных классов",category:"Высшая",exp:"36 лет",education:"Высшее, методика начального обучения",color:"#22c55e"},
+{name:"Седых Наталья Петровна",subject:"Музыка",category:"Высшая",exp:"37 лет",education:"Высшее, руководитель хора",color:"#a855f7"},
+{name:"Сетракова Ольга Александровна",subject:"История",category:"Высшая",exp:"35 лет",education:"Высшее, учитель истории",color:"#f59e0b"},
+{name:"Сеферова Елена Викторовна",subject:"Учитель начальных классов",category:"Среднее спец.",exp:"1 год",education:"Среднее специальное, учитель нач. кл.",color:"#22c55e"},
+{name:"Скоробогатова Гульнара Шамильевна",subject:"Русский язык и литература",category:"Высшая",exp:"37 лет",education:"Высшее, филолог, преподаватель",color:"#ec4899"},
+{name:"Сметанина Ирина Николаевна",subject:"Информатика",category:"Высшая",exp:"36 лет",education:"Высшее, физик, информатика и ИКТ",color:"#3b82f6"},
+{name:"Смирнова Анастасия Артемовна",subject:"Учитель начальных классов",category:"Среднее спец.",exp:"1 год",education:"Среднее специальное, учитель нач. кл.",color:"#22c55e"},
+{name:"Соболь Вера Алексеевна",subject:"Педагог-психолог",category:"Высшее",exp:"32 года",education:"Высшее, социальная работа",color:"#a855f7"},
+{name:"Сова Алла Павловна",subject:"Тьютор",category:"Высшее",exp:"9 лет",education:"Высшее, учитель истории",color:"#06b6d4"},
+{name:"Тарасова Ирина Владимировна",subject:"Учитель начальных классов",category:"Высшая",exp:"37 лет",education:"Высшее, преподавание в нач. кл.",color:"#22c55e"},
+{name:"Тимонова Антонина Валентиновна",subject:"Тьютор",category:"Среднее спец.",exp:"46 лет",education:"Среднее специальное, воспитатель",color:"#06b6d4"},
+{name:"Тимофеева Мария Вячеславовна",subject:"Педагог-психолог",category:"Первая",exp:"3 года",education:"Высшее, психология",color:"#a855f7"},
+{name:"Тыняная Ирина Леонидовна",subject:"История",category:"Высшая",exp:"49 лет",education:"Высшее, учитель истории",color:"#f59e0b"},
+{name:"Федичкина Светлана Матевосовна",subject:"Учитель начальных классов",category:"Высшая",exp:"34 года",education:"Высшее, учитель нач. кл.",color:"#22c55e"},
+{name:"Федорович Виктория Николаевна",subject:"Учитель начальных классов",category:"Первая",exp:"12 лет",education:"Высшее, преподавание в нач. кл.",color:"#22c55e"},
+{name:"Харькин Андрей Игоревич",subject:"Математика и информатика",category:"Высшее",exp:"11 лет",education:"Высшее, учитель физики и информатики",color:"#6366f1"},
+{name:"Черкасова Юлия Леонидовна",subject:"Тьютор",category:"Высшее",exp:"17 лет",education:"Высшее, дошкольное образование",color:"#06b6d4"},
+{name:"Черная Ольга Арсеновна",subject:"ИЗО",category:"Высшая",exp:"44 года",education:"Высшее, учитель трудового обучения",color:"#f43f5e"},
+{name:"Шапилова Людмила Сергеевна",subject:"Учитель начальных классов",category:"Первая",exp:"8 лет",education:"Среднее специальное, преподавание в нач. кл.",color:"#22c55e"},
+{name:"Шелякина Анастасия Олеговна",subject:"Иностранный язык",category:"Высшее",exp:"1 год",education:"Высшее, теория преподавания иностранных языков",color:"#14b8a6"}
+];
+var currentDay=0,currentClass='5а',calDate=new Date(),selectedDate=null,calVisible=false;
+function toggleCalendar(){calVisible=!calVisible;var w=document.getElementById('calendarWrapper');if(calVisible){w.classList.add('show');renderCalendar()}else{w.classList.remove('show')}}
+function renderCalendar(){
+var y=calDate.getFullYear(),m=calDate.getMonth();
+var months=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var first=new Date(y,m,1),lastDay=new Date(y,m+1,0).getDate(),startDow=(first.getDay()+6)%7,today=new Date();
+var h='<div class="cal-header"><button class="cal-nav" onclick="calNav(-1)">\u2039</button><div class="cal-month">'+months[m]+' '+y+'</div><button class="cal-nav" onclick="calNav(1)">\u203A</button></div>';
+h+='<div class="cal-grid"><div class="cal-dow">Пн</div><div class="cal-dow">Вт</div><div class="cal-dow">Ср</div><div class="cal-dow">Чт</div><div class="cal-dow">Пт</div><div class="cal-dow">Сб</div><div class="cal-dow">Вс</div>';
+var prevLast=new Date(y,m,0).getDate();
+for(var i=startDow-1;i>=0;i--)h+='<div class="cal-day other">'+(prevLast-i)+'</div>';
+for(var d=1;d<=lastDay;d++){var dow=(new Date(y,m,d).getDay()+6)%7,cls='cal-day';var isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;var isS=selectedDate&&selectedDate.getFullYear()===y&&selectedDate.getMonth()===m&&selectedDate.getDate()===d;if(isT)cls+=' today';if(isS)cls+=' selected';if(dow>=5)cls+=' weekend';h+='<div class="'+cls+'" onclick="selectDate('+y+','+m+','+d+')">'+d+'</div>'}
+var rem=(7-(startDow+lastDay)%7)%7;for(var i=1;i<=rem;i++)h+='<div class="cal-day other">'+i+'</div>';
+h+='</div><div style="text-align:center;margin-top:0.8rem;font-size:0.82rem;color:var(--text-muted)">'+(selectedDate?selectedDate.getDate()+'.'+(selectedDate.getMonth()+1)+'.'+selectedDate.getFullYear()+' \u2014 '+daysNames[(selectedDate.getDay()+6)%7]:'Нажмите на дату, чтобы выбрать день')+'</div>';
+document.getElementById('calendar').innerHTML=h}
+function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCalendar()}
+function selectDate(y,m,d){selectedDate=new Date(y,m,d);var dow=(selectedDate.getDay()+6)%7;renderCalendar();if(dow<6){selectDay(document.querySelectorAll('.day-btn')[dow],dow)}}
+function renderLessons(){
+var list=document.getElementById('lessonsList'),title=document.getElementById('dayTitle'),dayData=(schedule[currentClass]&&schedule[currentClass][currentDay])||[];
+title.innerHTML=daysNames[currentDay]+', <span>'+currentClass+' класс</span>';list.innerHTML='';
+if(!dayData.length){list.innerHTML='<div class="no-lessons"><span class="emoji">🎉</span>Уроков нет!<br>Можно отдыхать.</div>';return}
+dayData.forEach(function(l,i){var el=document.createElement('div');el.className='lesson';el.style.animationDelay=(i*0.08)+'s';el.innerHTML='<div class="lesson-color" style="background:'+l.color+'"></div><div class="lesson-num">'+l.num+'</div><div class="lesson-body"><div class="lesson-time">'+l.time+'</div><div class="lesson-subject">'+l.subject+'</div><div class="lesson-info"><span>\uD83D\uDC64 '+l.teacher+'</span><span class="lesson-room">'+l.room+'</span></div></div>';list.appendChild(el)})}
+function renderTeachers(filter){
+filter=filter||'';var grid=document.getElementById('teachersGrid'),countEl=document.getElementById('teachersCount');grid.innerHTML='';
+var filtered=teachers.filter(function(t){return t.name.toLowerCase().indexOf(filter.toLowerCase())>=0||t.subject.toLowerCase().indexOf(filter.toLowerCase())>=0});
+countEl.textContent='Всего педагогов: '+filtered.length+' из '+teachers.length;
+if(!filtered.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">Ничего не найдено 🔍</div>';return}
+filtered.forEach(function(t,i){var initials=t.name.split(' ').slice(0,2).map(function(w){return w[0]}).join('');var c=document.createElement('div');c.className='teacher-card';c.style.animationDelay=(i*0.04)+'s';c.onclick=function(){openTeacherModal(t)};c.innerHTML='<div class="teacher-avatar" style="background:linear-gradient(135deg,'+t.color+','+t.color+'99)">'+initials+'</div><div class="teacher-name">'+t.name+'</div><div class="teacher-subject">'+t.subject+'</div><div class="teacher-meta"><span class="teacher-tag tag-category">'+t.category+'</span><span class="teacher-tag tag-exp">стаж: '+t.exp+'</span></div>';grid.appendChild(c)})}
+function openTeacherModal(t){var i=t.name.split(' ').slice(0,2).map(function(w){return w[0]}).join('');document.getElementById('modalAvatar').innerHTML=i;document.getElementById('modalAvatar').style.background='linear-gradient(135deg,'+t.color+','+t.color+'99)';document.getElementById('modalName').textContent=t.name;document.getElementById('modalSubject').textContent=t.subject;document.getElementById('modalBody').innerHTML='<div class="modal-info-row"><span class="modal-info-label">Предмет</span><span class="modal-info-value">'+t.subject+'</span></div><div class="modal-info-row"><span class="modal-info-label">Категория</span><span class="modal-info-value">'+t.category+'</span></div><div class="modal-info-row"><span class="modal-info-label">Общий стаж</span><span class="modal-info-value">'+t.exp+'</span></div><div class="modal-info-row"><span class="modal-info-label">Образование</span><span class="modal-info-value">'+t.education+'</span></div><div class="modal-info-row"><span class="modal-info-label">Школа</span><span class="modal-info-value">МБОУ Школа №107</span></div>';document.getElementById('teacherModal').classList.add('show')}
+function closeModal(e){if(e&&e.target!==document.getElementById('teacherModal'))return;document.getElementById('teacherModal').classList.remove('show')}
+function getFavorites(){try{return JSON.parse(localStorage.getItem('favClasses')||'[]')}catch(e){return[]}}
+function setFavorites(f){localStorage.setItem('favClasses',JSON.stringify(f))}
+function toggleFavorite(){var f=getFavorites(),i=f.indexOf(currentClass);if(i>=0)f.splice(i,1);else f.push(currentClass);setFavorites(f);updateFavBtn();renderFavorites()}
+function updateFavBtn(){var b=document.getElementById('favBtn'),f=getFavorites();if(f.indexOf(currentClass)>=0){b.classList.add('fav-active');b.innerHTML='\u2605 В избранном'}else{b.classList.remove('fav-active');b.innerHTML='\u2B50 В избранное'}}
+function renderFavorites(){var f=getFavorites(),list=document.getElementById('favList');if(!f.length){list.innerHTML='<div class="fav-empty"><span class="emoji">\u2B50</span>Нет избранных классов.<br>Нажмите «В избранное» в расписании, чтобы добавить класс сюда.</div>';return}list.innerHTML='';f.forEach(function(cls,i){var c=document.createElement('div');c.className='fav-card';c.style.animationDelay=(i*0.08)+'s';c.innerHTML='<div class="fav-card-info"><div class="fav-card-icon">'+cls+'</div><div><div class="fav-card-name">'+cls+' класс</div><div class="fav-card-sub">Нажмите, чтобы открыть расписание</div></div></div><button class="fav-card-remove" onclick="removeFavorite(\''+cls+'\')">\u2715</button>';c.onclick=function(e){if(e.target.tagName==='BUTTON')return;goToClass(cls)};list.appendChild(c)})}
+function removeFavorite(cls){var f=getFavorites(),i=f.indexOf(cls);if(i>=0)f.splice(i,1);setFavorites(f);renderFavorites();updateFavBtn()}
+function goToClass(cls){var g=parseInt(cls);selectGrade(document.querySelectorAll('.grade-btn')[g-1],g);setTimeout(function(){var b=document.querySelectorAll('.class-btn');for(var i=0;i<b.length;i++)if(b[i].textContent===cls){selectClass(b[i],cls);break}},50);switchSection('schedule')}
+function switchSection(s){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});event.target.classList.add('active');document.getElementById('scheduleSection').style.display=s==='schedule'?'block':'none';document.getElementById('favoritesSection').style.display=s==='favorites'?'block':'none';document.getElementById('teachersSection').style.display=s==='teachers'?'block':'none';if(s==='favorites')renderFavorites()}
+function filterTeachers(){renderTeachers(document.getElementById('teacherSearch').value)}
+function selectDay(b,d){document.querySelectorAll('.day-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');currentDay=d;renderLessons()}
+function selectClass(b,c){document.querySelectorAll('.class-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');currentClass=c;renderLessons();updateFavBtn()}
+function selectGrade(b,g){document.querySelectorAll('.grade-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');var s=document.getElementById('classSelector');s.innerHTML='';gradeClasses[g].forEach(function(c,i){var e=document.createElement('div');e.className='class-btn'+(i===0?' active':'');e.textContent=c;e.onclick=function(){selectClass(this,c)};s.appendChild(e)});currentClass=gradeClasses[g][0];renderLessons();updateFavBtn()}
+selectGrade(document.querySelectorAll('.grade-btn')[4],5);renderTeachers();updateFavBtn();
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+</script>
+</body>
+</html>
